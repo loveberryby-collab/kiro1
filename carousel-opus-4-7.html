@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Opus 4.7 — Карусель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 900px;
+            height: 540px;
+            perspective: 1200px;
+        }
+
+        .carousel-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            transform: translateX(100px) scale(0.9);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: all;
+        }
+
+        .slide.prev {
+            opacity: 0;
+            transform: translateX(-100px) scale(0.9);
+        }
+
+        /* Slide 1 */
+        .slide-1 {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border: 1px solid rgba(100, 140, 255, 0.2);
+            box-shadow: 0 0 60px rgba(100, 140, 255, 0.1);
+        }
+
+        /* Slide 2 */
+        .slide-2 {
+            background: linear-gradient(135deg, #1a0a2e 0%, #2d1b69 50%, #44107a 100%);
+            border: 1px solid rgba(180, 100, 255, 0.2);
+            box-shadow: 0 0 60px rgba(180, 100, 255, 0.1);
+        }
+
+        /* Slide 3 */
+        .slide-3 {
+            background: linear-gradient(135deg, #0a2e1a 0%, #1b6940 50%, #10784a 100%);
+            border: 1px solid rgba(100, 255, 180, 0.2);
+            box-shadow: 0 0 60px rgba(100, 255, 180, 0.1);
+        }
+
+        /* Slide 4 */
+        .slide-4 {
+            background: linear-gradient(135deg, #2e1a0a 0%, #693b1b 50%, #784410 100%);
+            border: 1px solid rgba(255, 180, 100, 0.2);
+            box-shadow: 0 0 60px rgba(255, 180, 100, 0.1);
+        }
+
+        /* Slide 5 */
+        .slide-5 {
+            background: linear-gradient(135deg, #1a2e2e 0%, #1b5569 50%, #107878 100%);
+            border: 1px solid rgba(100, 230, 255, 0.2);
+            box-shadow: 0 0 60px rgba(100, 230, 255, 0.1);
+        }
+
+        .slide-number {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 16px;
+        }
+
+        .slide h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .slide h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 16px;
+        }
+
+        .slide p {
+            font-size: 18px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.75);
+            max-width: 700px;
+        }
+
+        .slide .highlight {
+            color: #64b5f6;
+            font-weight: 600;
+        }
+
+        .slide-2 .highlight { color: #ce93d8; }
+        .slide-3 .highlight { color: #81c784; }
+        .slide-4 .highlight { color: #ffb74d; }
+        .slide-5 .highlight { color: #80deea; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .features-list li {
+            font-size: 17px;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+
+        .features-list .icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            position: absolute;
+            bottom: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .dots {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #fff;
+            transform: scale(1.3);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tag-blue { background: rgba(100, 181, 246, 0.2); color: #64b5f6; }
+        .tag-purple { background: rgba(206, 147, 216, 0.2); color: #ce93d8; }
+        .tag-green { background: rgba(129, 199, 132, 0.2); color: #81c784; }
+        .tag-orange { background: rgba(255, 183, 77, 0.2); color: #ffb74d; }
+        .tag-cyan { background: rgba(128, 222, 234, 0.2); color: #80deea; }
+    </style>
+</head>
+<body>
+    <div class="carousel-container">
+        <div class="carousel-track">
+            <!-- Slide 1: Intro -->
+            <div class="slide slide-1 active">
+                <div class="slide-number">01 / 05</div>
+                <h1>Claude Opus 4.7</h1>
+                <p>
+                    Самая мощная общедоступная модель от Anthropic. Выпущена <span class="highlight">16 апреля 2026</span> года как прямое обновление Opus 4.6 с фокусом на сложный software engineering и агентные задачи.
+                </p>
+                <div style="margin-top: 24px;">
+                    <span class="tag tag-blue">API: claude-opus-4-7</span>
+                    <span class="tag tag-blue">1M токенов контекст</span>
+                    <span class="tag tag-blue">$5 / $25 за MTok</span>
+                </div>
+            </div>
+
+            <!-- Slide 2: Benchmarks -->
+            <div class="slide slide-2">
+                <div class="slide-number">02 / 05</div>
+                <h2>Бенчмарки: лидер в кодинге</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="number">87.6%</div>
+                        <div class="label">SWE-bench Verified</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">64.3%</div>
+                        <div class="label">SWE-bench Pro</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">70%</div>
+                        <div class="label">CursorBench</div>
+                    </div>
+                </div>
+                <p style="margin-top: 24px;">
+                    Опережает <span class="highlight">GPT-5.4</span> (57.7%) и <span class="highlight">Gemini 3.1 Pro</span> (54.2%) на SWE-bench Pro. Рост с 80.8% до 87.6% на SWE-bench Verified.
+                </p>
+            </div>
+
+            <!-- Slide 3: Key Features -->
+            <div class="slide slide-3">
+                <div class="slide-number">03 / 05</div>
+                <h2>Ключевые возможности</h2>
+                <ul class="features-list">
+                    <li><span class="icon">&#x1F9E0;</span> Адаптивное мышление — заменяет фиксированные бюджеты extended thinking</li>
+                    <li><span class="icon">&#x2705;</span> Самопроверка — модель верифицирует свою работу перед ответом</li>
+                    <li><span class="icon">&#x26A1;</span> Уровень xhigh — новый режим усилий между high и max</li>
+                    <li><span class="icon">&#x1F4CA;</span> Task budgets — контроль циклов для агентных задач</li>
+                    <li><span class="icon">&#x1F680;</span> 3x больше production-задач решается автономно</li>
+                </ul>
+            </div>
+
+            <!-- Slide 4: Vision -->
+            <div class="slide slide-4">
+                <div class="slide-number">04 / 05</div>
+                <h2>Зрение нового уровня</h2>
+                <p>
+                    Поддержка изображений до <span class="highlight">3.75 мегапикселей</span> — трёхкратный рост разрешения. Результат на XBOW Visual Acuity: <span class="highlight">98.5%</span> (было 54.5%).
+                </p>
+                <div class="stats-grid" style="margin-top: 30px; grid-template-columns: repeat(2, 1fr);">
+                    <div class="stat-card">
+                        <div class="number">3.75 MP</div>
+                        <div class="label">Макс. разрешение</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">98.5%</div>
+                        <div class="label">XBOW Visual Acuity</div>
+                    </div>
+                </div>
+                <p style="margin-top: 20px;">
+                    Идеально для computer use, анализа документов, UI-скриншотов и работы с диаграммами.
+                </p>
+            </div>
+
+            <!-- Slide 5: Availability -->
+            <div class="slide slide-5">
+                <div class="slide-number">05 / 05</div>
+                <h2>Доступность и платформы</h2>
+                <ul class="features-list">
+                    <li><span class="icon">&#x2601;</span> Amazon Bedrock — 27 регионов AWS</li>
+                    <li><span class="icon">&#x2601;</span> Google Vertex AI</li>
+                    <li><span class="icon">&#x2601;</span> Microsoft Foundry</li>
+                    <li><span class="icon">&#x1F4B0;</span> Цена: $5 / $25 за миллион токенов (input/output)</li>
+                    <li><span class="icon">&#x1F504;</span> Прямая замена Opus 4.6 (с breaking changes в API)</li>
+                </ul>
+                <div style="margin-top: 24px;">
+                    <span class="tag tag-cyan">Claude Pro</span>
+                    <span class="tag tag-cyan">Claude Team</span>
+                    <span class="tag tag-cyan">Claude Enterprise</span>
+                    <span class="tag tag-cyan">API</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="prevSlide()">&#8592;</button>
+            <div class="dots">
+                <div class="dot active" onclick="goToSlide(0)"></div>
+                <div class="dot" onclick="goToSlide(1)"></div>
+                <div class="dot" onclick="goToSlide(2)"></div>
+                <div class="dot" onclick="goToSlide(3)"></div>
+                <div class="dot" onclick="goToSlide(4)"></div>
+            </div>
+            <button class="nav-btn" onclick="nextSlide()">&#8594;</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 5;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+
+        function updateSlide(direction) {
+            slides[currentSlide].classList.remove('active');
+            slides[currentSlide].classList.add(direction === 'next' ? 'prev' : '');
+            dots[currentSlide].classList.remove('active');
+
+            // Small delay to reset non-active slides
+            setTimeout(() => {
+                slides.forEach((s, i) => {
+                    if (i !== currentSlide) {
+                        s.classList.remove('prev');
+                    }
+                });
+            }, 600);
+        }
+
+        function showSlide(index) {
+            slides[index].classList.remove('prev');
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            const direction = 'next';
+            updateSlide(direction);
+            const next = (currentSlide + 1) % totalSlides;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            const direction = 'prev';
+            updateSlide(direction);
+            const prev = (currentSlide - 1 + totalSlides) % totalSlides;
+            showSlide(prev);
+        }
+
+        function goToSlide(index) {
+            if (index === currentSlide) return;
+            const direction = index > currentSlide ? 'next' : 'prev';
+            updateSlide(direction);
+            showSlide(index);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Auto-play (optional, every 6 seconds)
+        // setInterval(nextSlide, 6000);
+    </script>
+</body>
+</html>
