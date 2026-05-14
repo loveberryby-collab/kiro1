@@ -403,6 +403,7 @@
         let results = [];
         let resultText = '';
         let resultFormat = 'login_pass';
+        let isProcessing = false;
 
         // Upload zone
         uploadZone.addEventListener('click', () => fileInput.click());
@@ -427,8 +428,10 @@
         });
 
         function handleFile(file) {
+            if (isProcessing) return;
             const reader = new FileReader();
             reader.onload = (e) => {
+                if (isProcessing) return;
                 const text = e.target.result;
                 keys = text.split('\n')
                     .map(l => l.trim())
@@ -508,6 +511,7 @@
             const rawDelay = parseFloat(document.getElementById('delay').value);
             const delay = Number.isNaN(rawDelay) ? 1 : rawDelay;
 
+            isProcessing = true;
             startBtn.disabled = true;
             startBtn.textContent = 'Обработка...';
             progressSection.classList.add('active');
@@ -570,6 +574,7 @@
                 downloadBtn.style.display = 'none';
             }
 
+            isProcessing = false;
             startBtn.disabled = false;
             startBtn.textContent = 'Запустить';
         });
