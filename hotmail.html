@@ -464,7 +464,7 @@
 
         // API call
         async function fetchAccount(apikey, domain, quantity) {
-            const url = `https://buyaccs.ss-mail.org/buy?mail_domain=${domain}&quantity=${quantity}&apikey=${apikey}&format=1`;
+            const url = `https://buyaccs.ss-mail.org/buy?mail_domain=${encodeURIComponent(domain)}&quantity=${encodeURIComponent(quantity)}&apikey=${encodeURIComponent(apikey)}&format=1`;
 
             try {
                 const resp = await fetch(url);
@@ -503,7 +503,7 @@
             const domain = document.getElementById('domain').value;
             const quantity = parseInt(document.getElementById('quantity').value) || 1;
             const format = document.getElementById('outputFormat').value;
-            const delay = parseFloat(document.getElementById('delay').value) || 1;
+            const delay = parseFloat(document.getElementById('delay').value) ?? 1;
 
             startBtn.disabled = true;
             startBtn.textContent = 'Обработка...';
