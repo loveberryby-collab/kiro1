@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotmail Account Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 640px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: #1a1a2e;
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #3a3a5e;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #6c63ff;
+            background: rgba(108, 99, 255, 0.05);
+        }
+
+        .upload-zone.has-file {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .upload-text strong {
+            color: #6c63ff;
+        }
+
+        .file-info {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #4caf50;
+        }
+
+        input[type="file"] { display: none; }
+
+        .settings-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .setting {
+            flex: 1;
+        }
+
+        .setting label {
+            display: block;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        .setting select, .setting input {
+            width: 100%;
+            padding: 10px 12px;
+            background: #12121f;
+            border: 1px solid #2a2a3e;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .setting select:focus, .setting input:focus {
+            border-color: #6c63ff;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            accent-color: #6c63ff;
+            width: 16px;
+            height: 16px;
+        }
+
+        .checkbox-row label {
+            font-size: 13px;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #6c63ff;
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5a52e0;
+        }
+
+        .btn-primary:disabled {
+            background: #3a3a5e;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .btn-download {
+            background: #4caf50;
+            color: #fff;
+            margin-top: 12px;
+        }
+
+        .btn-download:hover {
+            background: #43a047;
+        }
+
+        .progress-section {
+            display: none;
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: #12121f;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6c63ff, #4caf50);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .log {
+            background: #12121f;
+            border-radius: 6px;
+            padding: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .log-entry { margin-bottom: 2px; }
+        .log-success { color: #4caf50; }
+        .log-error { color: #f44336; }
+        .log-info { color: #888; }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+            padding: 16px;
+            background: #12121f;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .stat-value.success { color: #4caf50; }
+        .stat-value.error { color: #f44336; }
+
+        .results-preview {
+            background: #12121f;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            word-break: break-all;
+        }
+
+        .cors-note {
+            background: #2a1a00;
+            border: 1px solid #4a3000;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #ffb74d;
+            line-height: 1.5;
+        }
+
+        .cors-note a {
+            color: #6c63ff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hotmail Account Generator</h1>
+        <p class="subtitle">Загрузи файл с ключами — получи логины и пароли</p>
+
+        <div class="cors-note">
+            ⚠️ Браузер может блокировать запросы к API (CORS). Если не работает, установи расширение
+            <a href="https://chromewebstore.google.com/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino" target="_blank">CORS Unblock</a>
+            для Chrome и включи его.
+        </div>
+
+        <!-- Upload -->
+        <div class="card">
+            <div class="card-title">1. Загрузи файл с ключами</div>
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">
+                    <strong>Нажми</strong> или перетащи TXT файл сюда
+                </div>
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+            <input type="file" id="fileInput" accept=".txt">
+        </div>
+
+        <!-- Settings -->
+        <div class="card">
+            <div class="card-title">2. Настройки</div>
+            <div class="settings-row">
+                <div class="setting">
+                    <label>Домен</label>
+                    <select id="domain">
+                        <option value="hotmail">hotmail.com</option>
+                        <option value="outlook">outlook.com</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label>Кол-во на ключ</label>
+                    <input type="number" id="quantity" value="1" min="1" max="50">
+                </div>
+            </div>
+            <div class="settings-row">
+                <div class="setting">
+                    <label>Формат вывода</label>
+                    <select id="outputFormat">
+                        <option value="login_pass">email:password</option>
+                        <option value="full">email:password|refresh_token</option>
+                        <option value="json">JSON (все данные)</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label>Задержка (сек)</label>
+                    <input type="number" id="delay" value="1" min="0" max="30" step="0.5">
+                </div>
+            </div>
+        </div>
+
+        <!-- Start button -->
+        <button class="btn btn-primary" id="startBtn" disabled>Запустить</button>
+
+        <!-- Progress -->
+        <div class="card progress-section" id="progressSection">
+            <div class="card-title">Прогресс</div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-text" id="progressText">Подготовка...</div>
+            <div class="log" id="log"></div>
+        </div>
+
+        <!-- Results -->
+        <div class="card results-section" id="resultsSection">
+            <div class="card-title">Результаты</div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="totalKeys">0</div>
+                    <div class="stat-label">Ключей</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value success" id="totalSuccess">0</div>
+                    <div class="stat-label">Получено</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value error" id="totalErrors">0</div>
+                    <div class="stat-label">Ошибок</div>
+                </div>
+            </div>
+            <div class="results-preview" id="resultsPreview"></div>
+            <button class="btn btn-download" id="downloadBtn">Скачать результаты</button>
+        </div>
+    </div>
+
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const startBtn = document.getElementById('startBtn');
+        const progressSection = document.getElementById('progressSection');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const logEl = document.getElementById('log');
+        const resultsSection = document.getElementById('resultsSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        let keys = [];
+        let results = [];
+        let resultText = '';
+
+        // Upload zone
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target.result;
+                keys = text.split('\n')
+                    .map(l => l.trim())
+                    .filter(l => l && !l.startsWith('#'));
+
+                if (keys.length === 0) {
+                    fileInfo.textContent = 'Файл пустой или не содержит ключей';
+                    fileInfo.style.color = '#f44336';
+                    startBtn.disabled = true;
+                    return;
+                }
+
+                uploadZone.classList.add('has-file');
+                fileInfo.textContent = `${file.name} — ${keys.length} ключ(ей)`;
+                fileInfo.style.color = '#4caf50';
+                startBtn.disabled = false;
+            };
+            reader.readAsText(file);
+        }
+
+        // Log
+        function addLog(text, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log-entry log-${type}`;
+            div.textContent = text;
+            logEl.appendChild(div);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // Sleep
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // API call
+        async function fetchAccount(apikey, domain, quantity) {
+            const url = `https://buyaccs.ss-mail.org/buy?mail_domain=${domain}&quantity=${quantity}&apikey=${apikey}&format=1`;
+
+            try {
+                const resp = await fetch(url);
+                if (!resp.ok) {
+                    throw new Error(`HTTP ${resp.status}`);
+                }
+                const data = await resp.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                return Array.isArray(data) ? data : [data];
+            } catch (err) {
+                throw err;
+            }
+        }
+
+        // Format results
+        function formatResults(accounts, format) {
+            if (format === 'json') {
+                return JSON.stringify(accounts, null, 2);
+            }
+
+            return accounts.map(acc => {
+                const base = `${acc.email}:${acc.password}`;
+                if (format === 'full' && acc.refresh_token) {
+                    return `${base}|${acc.refresh_token}`;
+                }
+                return base;
+            }).join('\n');
+        }
+
+        // Start processing
+        startBtn.addEventListener('click', async () => {
+            const domain = document.getElementById('domain').value;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const format = document.getElementById('outputFormat').value;
+            const delay = parseFloat(document.getElementById('delay').value) || 1;
+
+            startBtn.disabled = true;
+            startBtn.textContent = 'Обработка...';
+            progressSection.classList.add('active');
+            resultsSection.classList.remove('active');
+            logEl.innerHTML = '';
+            results = [];
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            addLog(`Начинаю обработку ${keys.length} ключ(ей)...`, 'info');
+            addLog(`Домен: ${domain}, Количество: ${quantity}`, 'info');
+
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const keyShort = key.substring(0, 8) + '...' + key.slice(-4);
+                const pct = Math.round(((i + 1) / keys.length) * 100);
+
+                progressBar.style.width = pct + '%';
+                progressText.textContent = `${i + 1} / ${keys.length} (${pct}%)`;
+
+                addLog(`[${i + 1}/${keys.length}] Ключ: ${keyShort}`, 'info');
+
+                try {
+                    const accounts = await fetchAccount(key, domain, quantity);
+                    results.push(...accounts);
+                    successCount += accounts.length;
+
+                    for (const acc of accounts) {
+                        addLog(`  ✓ ${acc.email} : ${acc.password}`, 'success');
+                    }
+                } catch (err) {
+                    errorCount++;
+                    addLog(`  ✗ Ошибка: ${err.message}`, 'error');
+                }
+
+                if (i < keys.length - 1) {
+                    await sleep(delay * 1000);
+                }
+            }
+
+            addLog(`Готово! Получено: ${successCount}, Ошибок: ${errorCount}`, 'info');
+
+            // Show results
+            resultsSection.classList.add('active');
+            document.getElementById('totalKeys').textContent = keys.length;
+            document.getElementById('totalSuccess').textContent = successCount;
+            document.getElementById('totalErrors').textContent = errorCount;
+
+            if (results.length > 0) {
+                resultText = formatResults(results, format);
+                const preview = document.getElementById('resultsPreview');
+                const lines = resultText.split('\n');
+                preview.textContent = lines.length > 20
+                    ? lines.slice(0, 20).join('\n') + '\n...'
+                    : resultText;
+                downloadBtn.style.display = 'block';
+            } else {
+                document.getElementById('resultsPreview').textContent = 'Нет результатов';
+                downloadBtn.style.display = 'none';
+            }
+
+            startBtn.disabled = false;
+            startBtn.textContent = 'Запустить';
+        });
+
+        // Download
+        downloadBtn.addEventListener('click', () => {
+            const format = document.getElementById('outputFormat').value;
+            const ext = format === 'json' ? 'json' : 'txt';
+            const blob = new Blob([resultText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `accounts.${ext}`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
