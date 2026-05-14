@@ -402,6 +402,7 @@
         let keys = [];
         let results = [];
         let resultText = '';
+        let resultFormat = 'login_pass';
 
         // Upload zone
         uploadZone.addEventListener('click', () => fileInput.click());
@@ -503,7 +504,9 @@
             const domain = document.getElementById('domain').value;
             const quantity = parseInt(document.getElementById('quantity').value) || 1;
             const format = document.getElementById('outputFormat').value;
-            const delay = parseFloat(document.getElementById('delay').value) ?? 1;
+            resultFormat = format;
+            const rawDelay = parseFloat(document.getElementById('delay').value);
+            const delay = Number.isNaN(rawDelay) ? 1 : rawDelay;
 
             startBtn.disabled = true;
             startBtn.textContent = 'Обработка...';
@@ -573,8 +576,7 @@
 
         // Download
         downloadBtn.addEventListener('click', () => {
-            const format = document.getElementById('outputFormat').value;
-            const ext = format === 'json' ? 'json' : 'txt';
+            const ext = resultFormat === 'json' ? 'json' : 'txt';
             const blob = new Blob([resultText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
